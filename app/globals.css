@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  height: 100%;
+  background-color: #08080a;
+  color: #fff;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Wallboard: na TV (telas grandes) trava em 1 tela sem rolagem.
+   No celular vira coluna rolável. */
+.wallboard {
+  min-height: 100svh;
+}
+@media (min-width: 1280px) {
+  .wallboard {
+    height: 100vh;
+    overflow: hidden;
+  }
+}
+
+/* Números de placar: tabular para não "dançar" ao animar. */
+.tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Fundo com textura sutil western/grafite. */
+.bg-arena {
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgba(245, 182, 41, 0.08), transparent 60%),
+    radial-gradient(900px 500px at 0% 110%, rgba(245, 182, 41, 0.05), transparent 55%),
+    #08080a;
+}
+
+.card {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0)) ,
+    #15151a;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 1rem;
+}
+
+.card-gold {
+  border-color: rgba(245, 182, 41, 0.25);
+}
+
+/* Recharts: remove o outline ao focar. */
+.recharts-surface:focus {
+  outline: none;
+}
+
+/* Faixa diagonal estilo arena no header. */
+.stripe {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(245, 182, 41, 0.5) 0px,
+    rgba(245, 182, 41, 0.5) 2px,
+    transparent 2px,
+    transparent 9px
+  );
+}

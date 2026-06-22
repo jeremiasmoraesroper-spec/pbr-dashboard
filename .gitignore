@@ -1,0 +1,20 @@
+# dependências
+/node_modules
+
+# next.js
+/.next/
+/out/
+next-env.d.ts
+
+# produção
+/build
+
+# ambiente — NUNCA comitar chaves
+.env
+.env*.local
+.env.local
+
+# logs / sistema
+npm-debug.log*
+.DS_Store
+*.pem
