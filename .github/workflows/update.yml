@@ -1,0 +1,39 @@
+name: Atualizar dashboard (diario)
+
+on:
+  schedule:
+    - cron: "0 9 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - run: npm ci
+      - name: Coletar dados da Supermetrics
+        env:
+          SUPERMETRICS_API_KEY: ${{ secrets.SUPERMETRICS_API_KEY }}
+          SUPERMETRICS_ACCOUNT_ID: ${{ secrets.SUPERMETRICS_ACCOUNT_ID }}
+          SUPERMETRICS_DS_ID: ${{ secrets.SUPERMETRICS_DS_ID }}
+        run: npm run collect
+      - name: Build estatico
+        run: npm run build
+      - name: Publicar no GitHub Pages
+        run: |
+          touch out/.nojekyll
+          cd out
+          git init -q
+          git config user.name "pbr-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git checkout -q -b gh-pages
+          git add -A
+          git commit -qm "deploy diario"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" gh-pages
