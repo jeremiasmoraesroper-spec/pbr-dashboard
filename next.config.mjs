@@ -1,13 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: "export",
+  basePath: "/pbr-dashboard",
   reactStrictMode: true,
   images: {
-    // Miniaturas dos posts vêm do CDN do Instagram (cdninstagram / fbcdn).
+    unoptimized: true,
     remotePatterns: [
       { protocol: "https", hostname: "**.cdninstagram.com" },
       { protocol: "https", hostname: "**.fbcdn.net" },
       { protocol: "https", hostname: "scontent.cdninstagram.com" },
-      { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "picsum.photos" },
     ],
   },
