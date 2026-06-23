@@ -24,7 +24,7 @@ import { createClient } from "@supabase/supabase-js";
 
 const DRY_RUN = process.argv.includes("--dry-run");
 
-const API_KEY = process.env.SUPERMETRICS_API_KEY ?? "";
+const API_KEY = (process.env.SUPERMETRICS_API_KEY ?? "").trim();
 const ACCOUNT_ID = process.env.SUPERMETRICS_ACCOUNT_ID ?? "17841401478253574";
 const DS_ID = process.env.SUPERMETRICS_DS_ID ?? "IGI";
 const TZ = "America/Sao_Paulo";
