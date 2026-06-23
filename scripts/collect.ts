@@ -113,6 +113,9 @@ async function main() {
   const today = isoDateSP();
   console.log(`\n🐂 Coleta PBR · ${today} (TZ ${TZ})${DRY_RUN ? " · DRY-RUN" : ""}`);
   console.log(`   Conta ${ACCOUNT_ID} · data source ${DS_ID}\n`);
+  // Diagnóstico seguro da chave (não expõe o valor): tamanho + códigos de chars fora do padrão.
+  const bad = [...API_KEY].filter((c) => !/[A-Za-z0-9_-]/.test(c)).map((c) => c.charCodeAt(0));
+  console.log(`   [diag] key len=${API_KEY.length} | chars fora do padrão (codes): [${bad.join(",")}]`);
 
   // 1) Snapshot de hoje: total de seguidores, follows, media_count.
   const infoRows = await smQuery(
