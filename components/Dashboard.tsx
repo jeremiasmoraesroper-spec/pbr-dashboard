@@ -14,22 +14,19 @@ import PostsEngagementChart from "./charts/PostsEngagementChart";
 import EngagementTypeDonut from "./charts/EngagementTypeDonut";
 import BestTimeHeatmap from "./charts/BestTimeHeatmap";
 
-const REFRESH_MS = 5 * 60 * 1000; // 5 minutos
+const REFRESH_MS = 10 * 60 * 1000; // recarrega a tela a cada 10 minutos
 
 export default function Dashboard({ initial }: { initial: DashboardData }) {
-  const [data, setData] = useState(initial);
+  const [data] = useState(initial);
 
-  // Revalida a cada 5 min buscando o JSON já tratado da API route.
+  // Wallboard (site estático): os dados ficam embutidos no HTML gerado no build.
+  // Pra TV mostrar o dado novo sem ninguém apertar F5, recarregamos a página inteira
+  // de tempos em tempos, com cache-bust (?t=) pra garantir a versão mais recente.
   useEffect(() => {
-    const tick = async () => {
-      try {
-        const res = await fetch("/api/dashboard", { cache: "no-store" });
-        if (res.ok) setData(await res.json());
-      } catch {
-        /* mantém os dados atuais em caso de falha de rede */
-      }
-    };
-    const id = setInterval(tick, REFRESH_MS);
+    const id = setInterval(() => {
+      const base = window.location.href.split("?")[0];
+      window.location.replace(`${base}?t=${Date.now()}`);
+    }, REFRESH_MS);
     return () => clearInterval(id);
   }, []);
 
