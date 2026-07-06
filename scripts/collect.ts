@@ -180,8 +180,12 @@ async function main() {
   console.log(`   Posts coletados: ${postRows.length}`);
 
   // ---- Reconstrói os snapshots diários (totais de seguidores) ----
+  // Geramos 33 dias de snapshots (mais que os 28 da consulta) pra a métrica de
+  // "30 dias" ter ponto de partida. Os dias além dos 28 consultados são
+  // reconstruídos pelo ritmo recente (aproximação leve, só na ponta do gráfico).
+  const snapStart = addDays(today, -33);
   const dates: string[] = [];
-  for (let d = start; d <= today; d = addDays(d, 1)) dates.push(d);
+  for (let d = snapStart; d <= today; d = addDays(d, 1)) dates.push(d);
   // de trás pra frente a partir de hoje; lag preenchido com o ritmo recente
   const followersByDate = new Map<string, number>();
   followersByDate.set(today, currentFollowers);
