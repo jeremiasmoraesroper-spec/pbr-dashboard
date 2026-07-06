@@ -6,11 +6,20 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
 
 jobs:
   update:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -26,14 +35,14 @@ jobs:
         run: npm run collect
       - name: Build estatico
         run: npm run build
+      - name: Preparar artefato
+        run: touch out/.nojekyll
+      - name: Configurar Pages
+        uses: actions/configure-pages@v5
+      - name: Subir artefato
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
       - name: Publicar no GitHub Pages
-        run: |
-          touch out/.nojekyll
-          cd out
-          git init -q
-          git config user.name "pbr-bot"
-          git config user.email "bot@users.noreply.github.com"
-          git checkout -q -b gh-pages
-          git add -A
-          git commit -qm "deploy diario"
-          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" gh-pages
+        id: deployment
+        uses: actions/deploy-pages@v4
