@@ -131,8 +131,9 @@ async function main() {
   if (!currentFollowers) throw new Error("followers_count veio vazio — verifique a API key/conta.");
 
   // 2) Série diária: a métrica "New followers" (follower_count) só permite consultar
-  //    os ÚLTIMOS 30 DIAS EXCLUINDO O DIA ATUAL. Então: start = hoje-30, end = ontem.
-  const start = addDays(today, -30);
+  //    os ÚLTIMOS 30 DIAS EXCLUINDO O DIA ATUAL. Usamos -28/-1 pra ter margem de
+  //    segurança contra diferença de fuso (UTC x SP) que empurra o limite de 30 dias.
+  const start = addDays(today, -28);
   const yesterday = addDays(today, -1);
   const dailyRows = await smQuery(["date", "follower_count", "reach", "profile_views"], start, yesterday);
   const daily = new Map<
@@ -173,7 +174,7 @@ async function main() {
       "media_shares",
       "interactions",
     ],
-    addDays(today, -29),
+    addDays(today, -28),
     today,
   );
   console.log(`   Posts coletados: ${postRows.length}`);
