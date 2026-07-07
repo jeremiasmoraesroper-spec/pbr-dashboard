@@ -328,23 +328,33 @@ function buildAthleteRanking(posts: Post[], athletes: Athlete[]): AthleteRankRow
   // Normaliza (minúsculas + sem acentos) para casar "Ednélio" com "ednelio" etc.
   const norm = (s: string) =>
     s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+  const stripTag = (s: string) => norm(s).replace(/^[@#]/, "");
 
-  // Pré-calcula os termos de busca de cada atleta (@handle, hashtags, nome completo).
-  const athleteTerms = athletes.map((a) => {
-    const terms: string[] = [];
-    const handle = norm(a.instagram.replace("@", ""));
-    if (handle.length >= 3) terms.push(handle);
-    for (const h of a.hashtags) terms.push(norm(h));
+  // Pré-calcula os alvos de busca de cada atleta:
+  //  - capTerms: casam por SUBSTRING na LEGENDA (@handle, hashtags, nome, apelidos).
+  //  - tagTerms: casam por TOKEN EXATO nos @/# dos COMENTÁRIOS (@handle + hashtags).
+  const athleteMatch = athletes.map((a) => {
+    const handle = stripTag(a.instagram);
+    const capTerms: string[] = [];
+    if (handle.length >= 3) capTerms.push(handle);
+    for (const h of a.hashtags) capTerms.push(stripTag(h));
+    for (const al of a.aliases ?? []) capTerms.push(norm(al));
     const nameParts = norm(a.name).split(" ").filter(Boolean);
-    if (nameParts.length >= 2) terms.push(nameParts.join(" ")); // nome completo
-    return terms.filter((t) => t.length >= 4);
+    if (nameParts.length >= 2) capTerms.push(nameParts.join(" ")); // nome completo
+    const tagTerms = new Set(
+      [handle, ...a.hashtags.map(stripTag)].filter((t) => t.length >= 3),
+    );
+    return { capTerms: capTerms.filter((t) => t.length >= 4), tagTerms };
   });
 
   for (const post of posts) {
     const caption = norm(post.caption);
+    const cTags = post.commentTags ?? []; // @/# já extraídos e normalizados dos comentários
     for (let i = 0; i < athletes.length; i++) {
-      const hit = athleteTerms[i].some((t) => caption.includes(t));
-      if (hit) {
+      const m = athleteMatch[i];
+      const inCaption = m.capTerms.some((t) => caption.includes(t));
+      const inComments = cTags.some((tag) => m.tagTerms.has(tag));
+      if (inCaption || inComments) {
         rows[i].posts += 1;
         rows[i].totalEngagement += post.interactions;
       }

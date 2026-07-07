@@ -195,6 +195,36 @@ async function main() {
     followersByDate.set(dates[i], Math.round(followersByDate.get(next)! - gainOnNext));
   }
 
+  // ---- Coleta os COMENTÁRIOS e extrai @menções e #hashtags por post ----
+  // (Defensivo: se a consulta de comentários falhar, o robô segue sem eles.)
+  const commentTagsByPost = new Map<string, Set<string>>();
+  try {
+    const normTag = (s: string) =>
+      s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+    const commentRows = await smQuery(
+      ["media_id", "media_comment_text"],
+      addDays(today, -16),
+      today,
+    );
+    for (const c of commentRows) {
+      const mid = c.media_id;
+      const text = c.media_comment_text || "";
+      if (!mid || !text) continue;
+      const tags = new Set<string>();
+      for (const m of text.match(/[@#][a-zA-Z0-9_.]+/g) ?? []) {
+        const t = normTag(m).replace(/^[@#]/, "").replace(/\.+$/, "");
+        if (t.length >= 3) tags.add(t);
+      }
+      if (!tags.size) continue;
+      const cur = commentTagsByPost.get(mid) ?? new Set<string>();
+      tags.forEach((t) => cur.add(t));
+      commentTagsByPost.set(mid, cur);
+    }
+    console.log(`   Comentários processados: ${commentRows.length} · posts com @/# em comentário: ${commentTagsByPost.size}`);
+  } catch (e) {
+    console.log(`   (aviso) coleta de comentários falhou, seguindo sem ela: ${(e as Error).message?.slice(0, 120)}`);
+  }
+
   // ---- Normaliza posts ----
   const posts = postRows
     .filter((r) => r.media_id)
@@ -222,6 +252,7 @@ async function main() {
         saved,
         shares,
         interactions,
+        commentTags: [...(commentTagsByPost.get(r.media_id) ?? [])],
       };
     });
 

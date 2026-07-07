@@ -34,6 +34,8 @@ export interface Post {
   shares: number;
   /** interactions = soma das interações reportada pela API. */
   interactions: number;
+  /** @handles e #hashtags extraídos dos COMENTÁRIOS do post (tokens únicos, minúsculos). */
+  commentTags?: string[];
 }
 
 /** Atleta/peão da PBR para o ranking de engajamento. */
@@ -41,7 +43,9 @@ export interface Athlete {
   id: string;
   name: string;
   instagram: string; // @handle
-  hashtags: string[]; // termos pra cruzar com a legenda
+  hashtags: string[]; // hashtags oficiais do competidor (ex.: "jpv")
+  /** apelidos/variações/erros comuns do nome (ex.: "jpv", "joao velasco"). */
+  aliases?: string[];
 }
 
 /** Pacote completo já calculado que vai para o frontend. */

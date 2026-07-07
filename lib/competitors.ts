@@ -8,15 +8,21 @@ import { Athlete } from "./types";
 //  conhecidos) com a legenda dos posts dos ÚLTIMOS 15 DIAS e soma o
 //  engajamento (interactions). Só aparece quem foi citado/marcado nos posts.
 //
-//  A página oficial NÃO traz o @ do Instagram. Os @ abaixo foram deduzidos
-//  das marcações reais das legendas da PBR. Os marcados "// confirmar" são
-//  prováveis — vale conferir. Para captar mais atletas no ranking de
-//  engajamento, basta preencher o @instagram de cada um (campo instagram).
+//  COMO O SISTEMA IDENTIFICA (últimos 15 dias, soma o engajamento do post):
+//    • @ do competidor NA LEGENDA        (campo `instagram`)
+//    • Nome do competidor NA LEGENDA     (campo `name`)
+//    • Hashtag oficial NA LEGENDA        (campo `hashtags`, ex.: ["jpv"])
+//    • Apelidos/variações NA LEGENDA     (campo `aliases`, ex.: ["jpv","joao velasco"])
+//    • @ ou # do competidor NOS COMENTÁRIOS (usa `instagram` + `hashtags`)
+//  NÃO dá pela Supermetrics: marcação na foto/reel, colaborador (Collab),
+//  nome escrito na arte/thumbnail (OCR) — isso exigiria a API do Meta.
+//
+//  Para captar MAIS atletas: preencha o @instagram (e apelidos/hashtags).
 //  O comentário ao lado mostra a posição oficial e os pontos da temporada.
 // ==========================================================================
 
 export const COMPETITORS: Athlete[] = [
-  { id: "joaopaulovelasco", name: "João Paulo Velasco", instagram: "@joaopaulo.velasco.rzt", hashtags: [] }, // #1 · 860
+  { id: "joaopaulovelasco", name: "João Paulo Velasco", instagram: "@joaopaulo.velasco.rzt", hashtags: ["jpv"], aliases: ["jpv", "joao velasco"] }, // #1 · 860
   { id: "warleyoliveira", name: "Warley Oliveira da Silva", instagram: "@warley.kafeofc", hashtags: [] }, // #2 · 621,5 — confirmar @
   { id: "cleberhenrique", name: "Cleber Henrique Marques", instagram: "@cleberhenriquemarques", hashtags: [] }, // #3 · 494
   { id: "gabrielhenrique", name: "Gabriel Henrique da Silva", instagram: "", hashtags: [] }, // #4 · 437
@@ -39,7 +45,7 @@ export const COMPETITORS: Athlete[] = [
   { id: "hidelvan", name: "Hidelvan Ribeiro", instagram: "", hashtags: [] }, // #21 · 163
   { id: "rogeriovenancio", name: "Rogério Venâncio", instagram: "", hashtags: [] }, // #22 · 159,5
   { id: "wesleimendes", name: "Weslei Mendes", instagram: "", hashtags: [] }, // #23 · 149,5
-  { id: "rubensbarbosa", name: "Rubens Barbosa", instagram: "", hashtags: [] }, // #24 · 148,5
+  { id: "rubensbarbosa", name: "Rubens Barbosa", instagram: "@rubensbarbosa23", hashtags: [] }, // #24 · 148,5
   { id: "saislandesouza", name: "Saislan de Souza", instagram: "", hashtags: [] }, // #25 · 142,5
   { id: "jeandersondesouza", name: "Jeanderson de Souza", instagram: "", hashtags: [] }, // #26 · 141
   { id: "edneliorodrigues", name: "Ednélio Rodrigues", instagram: "@ednelio_r_almeida", hashtags: [] }, // #27 · 129 — confirmar @
